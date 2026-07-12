@@ -1,0 +1,23 @@
+fileFormatVersion: 2
+guid: a33173a6c22effb533f63af895e3f370
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Exo 2 Thin
+  fontNames:
+  - Exo 2 Thin
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: c6f761764fdf7960ab6d8eb910495746, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

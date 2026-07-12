@@ -11,6 +11,9 @@ TagManager:
   - Bomb
   - Powerup
   - Enemy
+  - Bad
+  - Sensor
+  - DestroyZone
   layers:
   - Default
   - TransparentFX
