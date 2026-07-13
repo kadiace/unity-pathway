@@ -10,9 +10,9 @@ public class MainManager : MonoBehaviour
     public static MainManager Instance { get; private set; }
 
     public Color TeamColor;
-    
+
     public ResourceDatabase ResourceDatabase;
-    
+
     private void Awake()
     {
         if (Instance != null)
@@ -23,9 +23,9 @@ public class MainManager : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
-        
+
         TeamColor = Color.white;
-        
+
         ResourceDatabase.Init();
 
         //we try to load the savefile if there is one to retrieve the right color
@@ -41,14 +41,16 @@ public class MainManager : MonoBehaviour
     {
         public Color TeamColor;
     }
-    
+
     public void SaveColor()
     {
-        SaveData data = new SaveData();
-        data.TeamColor = TeamColor;
+        SaveData data = new()
+        {
+            TeamColor = TeamColor
+        };
 
         string json = JsonUtility.ToJson(data);
-        
+
         File.WriteAllText(Application.persistentDataPath + "/savefile.json", json);
     }
 
