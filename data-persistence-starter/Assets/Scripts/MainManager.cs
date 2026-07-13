@@ -1,9 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using UnityEngine.InputSystem; // MIGRATED: New Input System namespace
+using UnityEngine.InputSystem;
+using TMPro; // MIGRATED: New Input System namespace
 
 public class MainManager : MonoBehaviour
 {
@@ -12,9 +14,13 @@ public class MainManager : MonoBehaviour
     public Rigidbody Ball;
 
     public Text ScoreText;
+    public Text RankingText;
     public GameObject GameOverText;
+    public TMP_InputField BestScoreInput;
+    public GameObject BestScore;
 
     private bool m_Started = false;
+    private bool m_newScore = false;
     private int m_Points;
 
     private bool m_GameOver = false;
@@ -46,7 +52,7 @@ public class MainManager : MonoBehaviour
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
 
-        int[] pointCountArray = new [] {1,1,2,2,5,5};
+        int[] pointCountArray = new[] { 1, 1, 2, 2, 5, 5 };
         for (int i = 0; i < LineCount; ++i)
         {
             for (int x = 0; x < perLine; ++x)
@@ -57,6 +63,14 @@ public class MainManager : MonoBehaviour
                 brick.onDestroyed.AddListener(AddPoint);
             }
         }
+
+        SaveData data = GetBestScoreData();
+        data ??= new()
+        {
+            name = "None",
+            point = 0
+        };
+        SetRankingText(data.name, data.point);
     }
 
     private void Update()
@@ -76,9 +90,25 @@ public class MainManager : MonoBehaviour
         }
         else if (m_GameOver)
         {
-            if (m_LaunchAction.WasPressedThisFrame()) // MIGRATED: was Input.GetKeyDown(KeyCode.Space)
+            if (m_newScore)
             {
-                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+                if (m_LaunchAction.WasPressedThisFrame()) // MIGRATED: was Input.GetKeyDown(KeyCode.Space)
+                {
+                    SaveBestScoreData(BestScoreInput.text, m_Points);
+
+                    SaveData data = GetBestScoreData();
+                    if (data == null)
+                        return;
+
+                    SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+                }
+            }
+            else
+            {
+                if (m_LaunchAction.WasPressedThisFrame()) // MIGRATED: was Input.GetKeyDown(KeyCode.Space)
+                {
+                    SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+                }
             }
         }
     }
@@ -92,6 +122,47 @@ public class MainManager : MonoBehaviour
     public void GameOver()
     {
         m_GameOver = true;
-        GameOverText.SetActive(true);
+        SaveData data = GetBestScoreData();
+        if (data == null)
+            return;
+        m_newScore = data != null && data.point < m_Points;
+        if (m_newScore)
+            BestScore.SetActive(true);
+        else
+            GameOverText.SetActive(true);
+    }
+
+    private SaveData GetBestScoreData()
+    {
+        string path = Application.persistentDataPath + "/savefile.json";
+        if (!File.Exists(path))
+        {
+            return null;
+        }
+        string json = File.ReadAllText(path);
+        return JsonUtility.FromJson<SaveData>(json);
+    }
+
+    private void SaveBestScoreData(string name, int point)
+    {
+        SaveData data = new()
+        {
+            name = name,
+            point = point
+        };
+        string newJson = JsonUtility.ToJson(data);
+        File.WriteAllText(Application.persistentDataPath + "/savefile.json", newJson);
+    }
+
+    private void SetRankingText(string name, int point)
+    {
+        RankingText.text = $"Best Score : {name} : {point}";
+    }
+
+    [System.Serializable]
+    class SaveData
+    {
+        public string name;
+        public int point;
     }
 }
